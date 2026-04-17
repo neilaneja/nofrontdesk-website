@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoFrontDesk — Contactless Check-In for Vacation Rentals</title>
+<meta name="description" content="QR code self-check-in for vacation rentals. Guests scan, enter their last name, and they're in. Works with Guesty. Set up in minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --accent: #e94560;
+    --accent-light: #ff6b81;
+    --bg: #ffffff;
+    --bg-alt: #f8f9fc;
+    --bg-dark: #0f0f23;
+    --text: #2d3748;
+    --text-light: #718096;
+    --text-on-dark: #e2e8f0;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  nav .container { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { text-decoration: none; color: var(--text-light); font-weight: 500; font-size: 15px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--primary); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 28px; border-radius: 8px; font-weight: 600;
+    font-size: 15px; text-decoration: none; transition: all 0.2s;
+    cursor: pointer; border: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--border); }
+  .btn-outline:hover { border-color: var(--primary); }
+  .btn-large { padding: 16px 36px; font-size: 17px; border-radius: 10px; }
+  .btn-white { background: #fff; color: var(--primary); }
+  .btn-white:hover { background: #f0f0f0; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 140px 0 80px;
+    text-align: center;
+    background: linear-gradient(180deg, #f8f9fc 0%, #ffffff 100%);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 100px;
+    background: #fef2f4; color: var(--accent);
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 800; line-height: 1.1;
+    color: var(--primary);
+    max-width: 780px; margin: 0 auto 20px;
+  }
+  .hero p {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text-light);
+    max-width: 600px; margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+  .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .hero-sub { margin-top: 16px; font-size: 14px; color: var(--text-light); }
+
+  /* ── DEMO MOCKUP ── */
+  .demo-section { padding: 40px 0 80px; }
+  .demo-wrapper {
+    max-width: 900px; margin: 0 auto;
+    background: var(--bg-dark);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .demo-step {
+    text-align: center;
+    padding: 24px 16px;
+  }
+  .demo-step-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(233,69,96,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+  }
+  .demo-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .demo-step h3 { color: #fff; font-size: 16px; margin-bottom: 6px; }
+  .demo-step p { color: var(--text-on-dark); font-size: 14px; line-height: 1.5; }
+  .demo-arrow { color: var(--accent); font-size: 24px; text-align: center; display: none; }
+
+  /* ── PROBLEM / SOLUTION ── */
+  .problem-section {
+    padding: 80px 0;
+    background: var(--bg-alt);
+  }
+  .section-label {
+    text-transform: uppercase; letter-spacing: 2px;
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 800; color: var(--primary);
+    margin-bottom: 16px; line-height: 1.2;
+  }
+  .section-subtitle {
+    font-size: 18px; color: var(--text-light);
+    max-width: 640px; line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .problem-card, .solution-card {
+    padding: 32px;
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .problem-card { border-left: 4px solid #e53e3e; }
+  .solution-card { border-left: 4px solid #38a169; }
+  .problem-card h3, .solution-card h3 {
+    font-size: 20px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .problem-card ul, .solution-card ul {
+    list-style: none; padding: 0;
+  }
+  .problem-card li, .solution-card li {
+    padding: 8px 0; font-size: 15px; color: var(--text);
+    display: flex; align-items: flex-start; gap: 10px;
+    line-height: 1.5;
+  }
+
+  /* ── FEATURES ── */
+  .features-section { padding: 80px 0; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .feature-card {
+    padding: 32px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .feature-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: #fef2f4;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .feature-card h3 { font-size: 18px; margin-bottom: 8px; color: var(--primary); }
+  .feature-card p { font-size: 15px; color: var(--text-light); line-height: 1.6; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    padding: 80px 0;
+    background: var(--bg-alt);
+  }
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .how-step { text-align: center; }
+  .how-step-num {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800;
+    margin: 0 auto 16px;
+  }
+  .how-step h3 { font-size: 17px; margin-bottom: 8px; color: var(--primary); }
+  .how-step p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+
+  /* ── PRICING ── */
+  .pricing-section { padding: 80px 0; text-align: center; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 960px;
+    margin: 48px auto 0;
+  }
+  .pricing-card {
+    padding: 36px 28px;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+    background: #fff;
+  }
+  .pricing-card.featured {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.04);
+  }
+  .pricing-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    padding: 4px 20px; border-radius: 100px;
+    font-size: 13px; font-weight: 700;
+    white-space: nowrap;
+  }
+  .pricing-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--primary); }
+  .pricing-card .price {
+    font-size: 48px; font-weight: 800; color: var(--primary);
+    margin: 16px 0 4px;
+  }
+  .pricing-card .price span { font-size: 18px; font-weight: 500; color: var(--text-light); }
+  .pricing-card .price-sub { font-size: 14px; color: var(--text-light); margin-bottom: 24px; }
+  .pricing-card ul { list-style: none; padding: 0; margin-bottom: 28px; text-align: left; }
+  .pricing-card li {
+    padding: 8px 0; font-size: 15px; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pricing-card li::before { content: "✓"; color: #38a169; font-weight: 700; }
+
+  /* ── GUESTY BADGE ── */
+  .guesty-section {
+    padding: 60px 0;
+    background: var(--bg-alt);
+    text-align: center;
+  }
+  .guesty-badge-container {
+    display: inline-flex; align-items: center; gap: 16px;
+    padding: 20px 36px;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .guesty-badge-container img { height: 40px; }
+  .guesty-badge-container span { font-size: 16px; font-weight: 600; color: var(--primary); }
+
+  /* ── FAQ ── */
+  .faq-section { padding: 80px 0; }
+  .faq-grid { max-width: 720px; margin: 48px auto 0; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+  }
+  .faq-item summary {
+    font-size: 17px; font-weight: 600; color: var(--primary);
+    cursor: pointer; list-style: none;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq-item summary::after { content: "+"; font-size: 24px; color: var(--accent); }
+  .faq-item[open] summary::after { content: "−"; }
+  .faq-item p {
+    margin-top: 12px; font-size: 15px;
+    color: var(--text-light); line-height: 1.7;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 80px 0;
+    background: var(--bg-dark);
+    text-align: center;
+  }
+  .cta-section h2 {
+    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: 800; color: #fff;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    font-size: 18px; color: var(--text-on-dark);
+    max-width: 520px; margin: 0 auto 32px;
+    line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  footer p { font-size: 14px; color: var(--text-light); }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .demo-wrapper { grid-template-columns: 1fr; padding: 24px; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .how-steps { grid-template-columns: 1fr 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .pricing-card.featured { transform: scale(1); }
+    .hero-ctas { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">No<span>FrontDesk</span></a>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#get-started" class="btn btn-primary">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span>&#9889;</span> Built for Guesty-powered properties
+    </div>
+    <h1>Contactless check-in,<br>finally solved.</h1>
+    <p>Your guests scan a QR code at the door, type their last name, and they're in. No app downloads. No front desk. No phone calls.</p>
+    <div class="hero-ctas">
+      <a href="#get-started" class="btn btn-primary btn-large">Start Free Trial</a>
+      <a href="#how-it-works" class="btn btn-outline btn-large">See How It Works</a>
+    </div>
+    <p class="hero-sub">Set up in under 10 minutes. No credit card required.</p>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-wrapper">
+      <div class="demo-step">
+        <div class="demo-step-icon">&#128247;</div>
+        <div class="demo-step-num">1</div>
+        <h3>Guest Scans QR</h3>
+        <p>Posted on the door, in their booking confirmation, or texted before arrival.</p>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-icon">&#9997;&#65039;</div>
+        <div class="demo-step-num">2</div>
+        <h3>Enters Last Name</h3>
+        <p>Clean, branded page. One field. Works on any phone, no app needed.</p>
+      </div>
+      <div class="demo-step">
+        <div class="demo-step-icon">&#9989;</div>
+        <div class="demo-step-num">3</div>
+        <h3>Checks In</h3>
+        <p>Instantly redirected to their Guesty check-in form with all their details.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM / SOLUTION -->
+<section class="problem-section">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <div class="section-title">Expedia killed your check-in flow.</div>
+    <div class="section-subtitle">
+      OTAs stopped sharing guest contact info with property managers. Now your automated check-in messages never reach the guest, and they're standing at your door with no way in.
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>&#128680; Without NoFrontDesk</h3>
+        <ul>
+          <li><span style="color:#e53e3e;">&#10005;</span> Guests arrive with no check-in instructions</li>
+          <li><span style="color:#e53e3e;">&#10005;</span> They call you (or worse, leave a bad review)</li>
+          <li><span style="color:#e53e3e;">&#10005;</span> You manually send check-in links one by one</li>
+          <li><span style="color:#e53e3e;">&#10005;</span> Late-night arrivals can't reach anyone</li>
+          <li><span style="color:#e53e3e;">&#10005;</span> Guest experience suffers across every OTA booking</li>
+        </ul>
+      </div>
+      <div class="solution-card">
+        <h3>&#9989; With NoFrontDesk</h3>
+        <ul>
+          <li><span style="color:#38a169;">&#10003;</span> QR code at the door handles everything</li>
+          <li><span style="color:#38a169;">&#10003;</span> Guest self-serves in under 30 seconds</li>
+          <li><span style="color:#38a169;">&#10003;</span> Works for every OTA: Expedia, Booking.com, Airbnb</li>
+          <li><span style="color:#38a169;">&#10003;</span> No staff needed, 24/7 availability</li>
+          <li><span style="color:#38a169;">&#10003;</span> Your branding, your colors, your welcome message</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="section-label">Features</div>
+      <div class="section-title">Everything you need. Nothing you don't.</div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#127912;</div>
+        <h3>Custom Branding</h3>
+        <p>Your logo, colors, and welcome message. Every property gets its own branded check-in page that matches your business.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128241;</div>
+        <h3>Works on Any Phone</h3>
+        <p>No app to download. Just a mobile-optimized web page that loads instantly when guests scan the QR code.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128279;</div>
+        <h3>Guesty Integration</h3>
+        <p>Connects directly to your Guesty account. Automatically finds reservations and routes guests to the right check-in form.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127968;</div>
+        <h3>Multi-Property</h3>
+        <p>Manage all your properties from one account. Each gets its own QR code, branding, and check-in URL.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128424;</div>
+        <h3>Print-Ready QR Signs</h3>
+        <p>Generate professional QR code signs for each property. Print them, frame them, stick them on the door.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9889;</div>
+        <h3>Instant Setup</h3>
+        <p>Connect your Guesty account, add your properties, and you're live. No coding, no IT department needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS (for property managers) -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="section-label">For Property Managers</div>
+      <div class="section-title">Live in under 10 minutes</div>
+      <div class="section-subtitle" style="margin:0 auto;">No coding. No developers. No IT support.</div>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <h3>Sign Up</h3>
+        <p>Create your account and connect your Guesty credentials in two clicks.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <h3>Add Properties</h3>
+        <p>Name your properties, upload your logo, and pick your brand colors.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <h3>Print QR Signs</h3>
+        <p>Generate and print QR code signs for each property's entrance.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">4</div>
+        <h3>You're Live</h3>
+        <p>Guests start using it immediately. No training, no onboarding calls.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="container">
+    <div class="section-label">Simple Pricing</div>
+    <div class="section-title">One price per unit. No surprises.</div>
+    <div class="section-subtitle" style="margin:0 auto;">Start free for 14 days. Cancel anytime.</div>
+    <div class="pricing-grid">
+
+      <div class="pricing-card">
+        <h3>Starter</h3>
+        <p style="color:var(--text-light);font-size:14px;">Perfect for small operators</p>
+        <div class="price">$29<span>/mo</span></div>
+        <div class="price-sub">Up to 5 units</div>
+        <ul>
+          <li>Custom branding per property</li>
+          <li>QR code sign generator</li>
+          <li>Guesty integration</li>
+          <li>Mobile-optimized check-in</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#get-started" class="btn btn-outline" style="width:100%;">Start Free Trial</a>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Most Popular</div>
+        <h3>Growth</h3>
+        <p style="color:var(--text-light);font-size:14px;">For growing portfolios</p>
+        <div class="price">$59<span>/mo</span></div>
+        <div class="price-sub">Up to 20 units</div>
+        <ul>
+          <li>Everything in Starter</li>
+          <li>Priority support</li>
+          <li>Custom domain support</li>
+          <li>Analytics dashboard</li>
+          <li>Multiple team members</li>
+        </ul>
+        <a href="#get-started" class="btn btn-primary" style="width:100%;">Start Free Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>Pro</h3>
+        <p style="color:var(--text-light);font-size:14px;">For large operators</p>
+        <div class="price">$99<span>/mo</span></div>
+        <div class="price-sub">Up to 50 units</div>
+        <ul>
+          <li>Everything in Growth</li>
+          <li>White-label option</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+          <li>Phone support</li>
+        </ul>
+        <a href="#get-started" class="btn btn-outline" style="width:100%;">Start Free Trial</a>
+      </div>
+
+    </div>
+    <p style="margin-top:24px;font-size:14px;color:var(--text-light);">Need 50+ units? <a href="mailto:hello@nofrontdesk.com" style="color:var(--accent);text-decoration:none;font-weight:600;">Contact us</a> for enterprise pricing.</p>
+  </div>
+</section>
+
+<!-- GUESTY INTEGRATION CALLOUT -->
+<section class="guesty-section">
+  <div class="container">
+    <div class="section-label">Trusted Integration</div>
+    <div class="section-title" style="margin-bottom:32px;">Built specifically for Guesty</div>
+    <div class="guesty-badge-container">
+      <span style="font-size:28px;">&#127919;</span>
+      <span>Official Guesty Marketplace Partner</span>
+    </div>
+    <p style="margin-top:16px;font-size:15px;color:var(--text-light);">NoFrontDesk connects directly to the Guesty Open API to find reservations and route guests to the correct check-in form.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div style="text-align:center;">
+      <div class="section-label">FAQ</div>
+      <div class="section-title">Common questions</div>
+    </div>
+    <div class="faq-grid">
+
+      <details class="faq-item">
+        <summary>Do I need to be technical to set this up?</summary>
+        <p>Not at all. If you can copy and paste, you can set up NoFrontDesk. The whole process takes under 10 minutes. You just connect your Guesty credentials, add your property details, and print the QR code signs.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this work with Expedia bookings?</summary>
+        <p>Yes, that's exactly why we built it. When Expedia stopped passing guest contact info to PMS systems, automated check-in messages stopped reaching guests. NoFrontDesk solves this by letting guests self-serve at the property using a QR code — no prior contact needed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What does the guest experience look like?</summary>
+        <p>The guest scans a QR code at your property door, sees a clean branded page, types their last name, and is instantly redirected to their Guesty check-in form. The entire process takes about 20 seconds. No app download, no account creation.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this replace my Guesty check-in form?</summary>
+        <p>No. NoFrontDesk is the bridge that gets guests to your existing Guesty check-in form. It's the front door to the check-in process — especially for guests who never received your automated messages.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if two guests have the same last name?</summary>
+        <p>NoFrontDesk shows a disambiguation screen with check-in and check-out dates so the guest can select their correct reservation. Each reservation links to its own unique Guesty check-in form.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I use my own domain?</summary>
+        <p>Yes. On the Growth plan and above, you can use a custom domain like checkin.yourproperty.com. On the Starter plan, your check-in pages are hosted at yourproperty.nofrontdesk.com.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What PMS systems do you support?</summary>
+        <p>We currently support Guesty. Support for Hostaway, Lodgify, and other PMS systems is on the roadmap. If you'd like to be notified when your PMS is supported, sign up for our waitlist.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I cancel anytime?</summary>
+        <p>Yes. There are no contracts or commitments. You can cancel your subscription at any time, and you won't be charged for the next billing cycle.</p>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="get-started">
+  <div class="container">
+    <h2>Stop losing guests at the door.</h2>
+    <p>Set up NoFrontDesk in 10 minutes and never worry about contactless check-in again.</p>
+    <a href="mailto:hello@nofrontdesk.com?subject=NoFrontDesk%20-%20Get%20Started" class="btn btn-white btn-large">Get Started Free</a>
+    <p style="margin-top:16px;font-size:14px;color:var(--text-on-dark);opacity:0.7;">14-day free trial. No credit card required.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom:8px;"><a href="#" class="logo" style="font-size:18px;">No<span style="color:var(--accent);">FrontDesk</span></a></p>
+    <p>&copy; 2026 NoFrontDesk. All rights reserved. | <a href="mailto:hello@nofrontdesk.com">hello@nofrontdesk.com</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
